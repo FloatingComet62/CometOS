@@ -3,10 +3,5 @@ name = "cometos"
 version = "0.1.0"
 edition = "2021"
 
-[profile.dev]
-panic = "abort" # disable stack unwinding on panic
-
-[profile.release]
-panic = "abort" # disable stack unwinding on panic
-
 [dependencies]
+bootloader = "0.9.8"
