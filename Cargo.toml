@@ -4,4 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bootloader = "0.9.8"
+bootloader = "0.9.8" # loads the flat binary
+volatile = "0.2.6" # prevents rust from optimizing away writes on the vga buffer
+spin = "0.9.4"
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["spin_no_std"] # we don't link to std, so we need a version which doesn't require std
