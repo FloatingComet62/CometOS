@@ -11,8 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Put the source code in the current directory
+      - name: Checkout
         uses: actions/checkout@v3
+        
+      - name: Pre-build
+        run: rustup component add llvm-tools-preview
     
       - name: Build
         run: cargo build --verbose
@@ -22,9 +25,12 @@ jobs:
     steps:
       - name: Install QEMU
         uses: docker/setup-qemu-action@v2.1.0
-      
-      - name: Put the source code in the current directory
+        
+      - name: Checkout
         uses: actions/checkout@v3
+        
+      - name: Pre-build
+        run: rustup component add llvm-tools-preview
       
       - name: Test
         run: cargo test --verbose
