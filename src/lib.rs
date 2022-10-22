@@ -15,13 +15,22 @@ pub mod gdt;
 pub extern "C" fn _start() -> ! {
     init();
     test_main();
-    loop {}
+    hlt_loop();
+}
+pub fn hlt_loop() -> ! {
+    loop {
+        x86_64::instructions::hlt();
+    }
 }
 
 // GDT & IDT setup
 pub fn init() {
     gdt::init();
     interrupts::init_idt();
+    unsafe {
+        interrupts::PICS.lock().initialize()
+    };
+    x86_64::instructions::interrupts::enable();
 }
 
 // Testing

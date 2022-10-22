@@ -18,7 +18,7 @@ pub extern "C" fn _start() -> ! {
     #[cfg(test)]
     test_main();
 
-    loop {}
+    cometos::hlt_loop();
 }
 
 // Panic handler
@@ -28,7 +28,7 @@ use core::panic::PanicInfo;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    cometos::hlt_loop();
 }
 #[cfg(test)]
 #[panic_handler]
