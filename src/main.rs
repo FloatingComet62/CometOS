@@ -4,7 +4,7 @@
 #![test_runner(cometos::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-use cometos::println;
+// use cometos::println;
 
 // Main
 #[no_mangle] // don't change the function name, keep it _start
