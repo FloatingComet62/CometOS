@@ -27,6 +27,7 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     steps:
+      - run: ls
       - name: Build
         run: cargo build --verbose
   
@@ -34,5 +35,6 @@ jobs:
     needs: base
     runs-on: ubuntu-latest
     steps:
+      - run: ls
       - name: Test
         run: cargo test --verbose
