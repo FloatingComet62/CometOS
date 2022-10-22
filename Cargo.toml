@@ -3,11 +3,26 @@ name = "cometos"
 version = "0.1.0"
 edition = "2021"
 
+[[test]]
+name = "should_panic"
+harness = false
+
 [dependencies]
 bootloader = "0.9.8" # loads the flat binary
 volatile = "0.2.6" # prevents rust from optimizing away writes on the vga buffer
-spin = "0.9.4"
+spin = "0.5.2" # idk why this is needed
+x86_64 = "0.14.10" # allows us to invoke "in" and "out" assembly instructions in a more rusty way
+uart_16550 = "0.2.18" # Allows us to print stuff in the console
 
 [dependencies.lazy_static]
 version = "1.0"
-features = ["spin_no_std"] # we don't link to std, so we need a version which doesn't require std
+features = ["spin_no_std"] # we don't link to std,a so we need a version which doesn't require std
+
+[package.metadata.bootimage]
+test-args = [
+  "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
+  "-serial", "stdio", # allows us to print to the console
+  "-display", "none" # we don't need to see the qemu window while testing
+]
+test-success-exit-code = 33 # (0x10 << 1) | 1
+test-timeout = 300 # 5 mins | we need this to prevent the test runner getting stuck in a infinite loop
