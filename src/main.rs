@@ -11,6 +11,10 @@ use cometos::println;
 pub extern "C" fn _start() -> ! {
     println!("Hello world{}", "!");
 
+    cometos::init(); // IDT init
+    
+    x86_64::instructions::interrupts::int3();
+
     #[cfg(test)]
     test_main();
 
