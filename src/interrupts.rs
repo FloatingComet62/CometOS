@@ -24,14 +24,61 @@
 // 13-14   Descriptor Privilege Level       The minimal privilege level required for calling this
                                          // handler
 // 15      Present
+//
+// List of Interrupts
+//
+// 0x0 Division by 0                   [Fault]
+// 0x1  Debug                          [Fault/Trap]
+// 0x2  Non-maskable Interrupt         [Interrupt]
+// 0x3  Breakpoint                     [Trap]
+// 0x4  Overflow                       [Trap]
+// 0x5  Bound Range Exceeded           [Fault]
+// 0x6  Invalid Opcode                 [Fault]
+// 0x7  Device Not Available           [Fault]
+// 0x8  Double Fault                   [Abort] [Error Code Given]
+// 0xA  Invalid TSS                    [Fault] [Error Code Given]
+// 0xB  Segment Not Present            [Fault] [Error Code Given]
+// 0xC  Stack-Segment Fault            [Fault] [Error Code Given]
+// 0xD  General Protection Fault       [Fault] [Error Code Given]
+// 0xE  Page Fault                     [Fault] [Error Code Given]
+// 0XF  Reserved
+// 0x10 x87 Floating-Point Exception   [Fault]
+// 0x11 Alignment Check                [Fault] [Error Code Given]
+// 0x12 Machine Check                  [Abort]
+// 0x13 SIMD Floating-Point Exception  [Fault]
+// 0x14 Virtualization Exception       [Fault]
+// 0x15 Control Protection Exception   [Fault] [Error Code Given]
+// 0x16-0x1B Reserved
+// 0x1C Hypervisor Injection Exception [Fault]
+// 0x1D VMM Communication Exception    [Fault] [Error Code Given]
+// 0x1E Security Exception             [Fault] [Error Code Given]
+// 0x1F Reserved
+// -    Triple Fault
+//
+// 64 bit TSS format
+//
+// Field                    Type
+// Reserved                 u32
+// Privilege Stack Table    [u64; 3]
+// Reserved                 u64
+// Interrupt Stack Table    [u64; 7]
+// Reserved                 u64
+// Reserved                 u16
+// I/O Map Base Address     u16
 
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 use lazy_static::lazy_static;
+
+use crate::gdt;
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
+        unsafe {
+            idt.double_fault.set_handler_fn(double_fault_handler)
+                .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
+        }
         idt
     };
 }
@@ -42,8 +89,12 @@ pub fn init_idt() {
 
 use crate::println;
 
+// Exception Handler
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
     println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
+}
+extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> ! {
+    panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
 }
 
 // Tests

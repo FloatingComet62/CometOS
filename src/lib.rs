@@ -8,6 +8,7 @@
 pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
+pub mod gdt;
 
 #[cfg(test)]
 #[no_mangle]
@@ -17,8 +18,9 @@ pub extern "C" fn _start() -> ! {
     loop {}
 }
 
-// IDT setup
+// GDT & IDT setup
 pub fn init() {
+    gdt::init();
     interrupts::init_idt();
 }
 
