@@ -7,30 +7,30 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  base:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         
-      - name: Pre-build
-        run: rustup component add llvm-tools-preview
-    
+      - name: Install QEMU
+        uses: docker/setup-qemu-action@v2.1.0
+      
+      - run: rustup component add rust-src
+      - run: rustup component add llvm-tools-preview
+      - run: cargo bootimage
+  
+  build:
+    needs: base
+    runs-on: ubuntu-latest
+    steps:
       - name: Build
         run: cargo build --verbose
   
   test:
+    needs: base
     runs-on: ubuntu-latest
     steps:
-      - name: Install QEMU
-        uses: docker/setup-qemu-action@v2.1.0
-        
-      - name: Checkout
-        uses: actions/checkout@v3
-        
-      - name: Pre-build
-        run: rustup component add llvm-tools-preview
-      
       - name: Test
         run: cargo test --verbose
