@@ -19,6 +19,7 @@ jobs:
       
       - run: rustup component add rust-src
       - run: rustup component add llvm-tools-preview
+      - run: cargo install bootimage
       - run: cargo bootimage
   
   build:
