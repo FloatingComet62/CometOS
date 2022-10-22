@@ -17,6 +17,7 @@ jobs:
       - name: Install QEMU
         uses: docker/setup-qemu-action@v2.1.0
       
+      - run: rustup override set nightly
       - run: rustup component add rust-src
       - run: rustup component add llvm-tools-preview
       - run: cargo install bootimage
