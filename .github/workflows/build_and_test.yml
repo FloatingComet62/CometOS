@@ -22,19 +22,6 @@ jobs:
       - run: rustup component add llvm-tools-preview
       - run: cargo install bootimage
       - run: cargo bootimage
-  
-  build:
-    needs: base
-    runs-on: ubuntu-latest
-    steps:
-      - run: ls
-      - name: Build
-        run: cargo build --verbose
-  
-  test:
-    needs: base
-    runs-on: ubuntu-latest
-    steps:
-      - run: ls
-      - name: Test
-        run: cargo test --verbose
+      
+      - run: cargo build --verbose
+      - run: cargo test --verbose
