@@ -1,7 +1,7 @@
 #![no_std] // we don't want to include C standard library
 #![no_main] // since we don't include std, there is no main calling function
-#![feature(custom_test_frameworks)]
-#![test_runner(cometos::test_runner)]
+#![feature(custom_test_frameworks)] // the rust test runner is include in std
+#![test_runner(cometos::test_runner)] // defining the test runner
 #![reexport_test_harness_main = "test_main"]
 
 use cometos::println;
@@ -11,9 +11,9 @@ use cometos::println;
 pub extern "C" fn _start() -> ! {
     println!("Hello world{}", "!");
 
-    cometos::init(); // IDT init
+    cometos::init(); // Initialize IDT and GDT
     
-    x86_64::instructions::interrupts::int3();
+    x86_64::instructions::interrupts::int3(); // src/interrupts.rs | Line 169
 
     #[cfg(test)]
     test_main();

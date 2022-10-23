@@ -27,33 +27,33 @@
 //
 // List of Interrupts
 //
-// 0x0 Division by 0                   [Fault]
-// 0x1  Debug                          [Fault/Trap]
-// 0x2  Non-maskable Interrupt         [Interrupt]
-// 0x3  Breakpoint                     [Trap]
-// 0x4  Overflow                       [Trap]
-// 0x5  Bound Range Exceeded           [Fault]
-// 0x6  Invalid Opcode                 [Fault]
-// 0x7  Device Not Available           [Fault]
-// 0x8  Double Fault                   [Abort] [Error Code Given]
-// 0xA  Invalid TSS                    [Fault] [Error Code Given]
-// 0xB  Segment Not Present            [Fault] [Error Code Given]
-// 0xC  Stack-Segment Fault            [Fault] [Error Code Given]
-// 0xD  General Protection Fault       [Fault] [Error Code Given]
-// 0xE  Page Fault                     [Fault] [Error Code Given]
-// 0XF  Reserved
-// 0x10 x87 Floating-Point Exception   [Fault]
-// 0x11 Alignment Check                [Fault] [Error Code Given]
-// 0x12 Machine Check                  [Abort]
-// 0x13 SIMD Floating-Point Exception  [Fault]
-// 0x14 Virtualization Exception       [Fault]
-// 0x15 Control Protection Exception   [Fault] [Error Code Given]
-// 0x16-0x1B Reserved
-// 0x1C Hypervisor Injection Exception [Fault]
-// 0x1D VMM Communication Exception    [Fault] [Error Code Given]
-// 0x1E Security Exception             [Fault] [Error Code Given]
-// 0x1F Reserved
-// -    Triple Fault
+// 0x0        Division by 0                  [Fault]
+// 0x1        Debug                          [Fault/Trap]
+// 0x2        Non-maskable Interrupt         [Interrupt]
+// 0x3        Breakpoint                     [Trap]
+// 0x4        Overflow                       [Trap]
+// 0x5        Bound Range Exceeded           [Fault]
+// 0x6        Invalid Opcode                 [Fault]
+// 0x7        Device Not Available           [Fault]
+// 0x8        Double Fault                   [Abort] [Error Code Given]
+// 0xA        Invalid TSS                    [Fault] [Error Code Given]
+// 0xB        Segment Not Present            [Fault] [Error Code Given]
+// 0xC        Stack-Segment Fault            [Fault] [Error Code Given]
+// 0xD        General Protection Fault       [Fault] [Error Code Given]
+// 0xE        Page Fault                     [Fault] [Error Code Given]
+// 0XF        Reserved
+// 0x10       x87 Floating-Point Exception   [Fault]
+// 0x11       Alignment Check                [Fault] [Error Code Given]
+// 0x12       Machine Check                  [Abort]
+// 0x13       SIMD Floating-Point Exception  [Fault]
+// 0x14       Virtualization Exception       [Fault]
+// 0x15       Control Protection Exception   [Fault] [Error Code Given]
+// 0x16-0x1B  Reserved
+// 0x1C       Hypervisor Injection Exception [Fault]
+// 0x1D       VMM Communication Exception    [Fault] [Error Code Given]
+// 0x1E       Security Exception             [Fault] [Error Code Given]
+// 0x1F       Reserved
+// -          Triple Fault
 //
 // 64 bit TSS format
 //
@@ -89,6 +89,31 @@ lazy_static! {
 
 pub fn init_idt() {
     IDT.load();
+}
+
+
+// Hardware Interrupt setup
+use pic8259::ChainedPics;
+use spin;
+
+pub const PIC_1_OFFSET: u8 = 32;
+pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
+pub static PICS: spin::Mutex<ChainedPics> = spin::Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
+pub enum InterruptIndex {
+    Timer = PIC_1_OFFSET,
+    Keyboard,
+}
+impl InterruptIndex {
+    fn as_u8(self) -> u8 {
+        self as u8
+    }
+
+    fn as_usize(self) -> usize {
+        usize::from(self.as_u8())
+    }
 }
 
 use crate::{println, print};
@@ -138,32 +163,12 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
     }
 }
 
-// Hardware Interrupts
-use pic8259::ChainedPics;
-use spin;
-
-pub const PIC_1_OFFSET: u8 = 32;
-pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
-pub static PICS: spin::Mutex<ChainedPics> = spin::Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
-
-#[derive(Debug, Clone, Copy)]
-#[repr(u8)]
-pub enum InterruptIndex {
-    Timer = PIC_1_OFFSET,
-    Keyboard,
-}
-impl InterruptIndex {
-    fn as_u8(self) -> u8 {
-        self as u8
-    }
-
-    fn as_usize(self) -> usize {
-        usize::from(self.as_u8())
-    }
-}
-
 // Tests
 #[test_case]
 fn test_breakpoint_exception() {
+    // When the user sets a breakpoint, the debugger overwrites the corresponding instruction with
+    // the int3 instruction so that the CPU throws the breakpoint exception when it reaches that
+    // line. When the user wants to continue the program, the debugger replaces the in3 instruction
+    // with the original instruction again and continues the program.
     x86_64::instructions::interrupts::int3();
 }

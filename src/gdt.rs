@@ -2,8 +2,6 @@
 // However, it is still needed in 64 bit mode for various things, such as kernal/user mode
 // configuration or TSS loading.
 
-#![allow(dead_code)]
-
 use x86_64::VirtAddr;
 use x86_64::structures::tss::TaskStateSegment;
 use lazy_static::lazy_static;

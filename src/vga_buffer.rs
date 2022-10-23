@@ -53,7 +53,7 @@ use volatile::Volatile;
 struct Buffer {
     chars: [
         [
-            Volatile<ScreenChar>; // info in cargo.toml
+            Volatile<ScreenChar>; // Cargo.toml | Line 16 
             BUFFER_WIDTH
         ];
         BUFFER_HEIGHT
