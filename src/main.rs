@@ -1,19 +1,32 @@
 #![no_std] // we don't want to include C standard library
 #![no_main] // since we don't include std, there is no main calling function
-#![feature(custom_test_frameworks)] // the rust test runner is include in std
+#![feature(custom_test_frameworks)] // the rust test runner is included in std
 #![test_runner(cometos::test_runner)] // defining the test runner
 #![reexport_test_harness_main = "test_main"]
 
+use bootloader::{BootInfo, entry_point};
 use cometos::println;
 
-// Main
-#[no_mangle] // don't change the function name, keep it _start
-pub extern "C" fn _start() -> ! {
-    println!("Hello world{}", "!");
 
+// Main
+entry_point!(kernel_main);
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use cometos::memory::{BootInfoFrameAllocator, init, create_example_mapping};
+    use x86_64::{structures::paging::Page, VirtAddr};
+
+    println!("Hello world{}", "!");
     cometos::init(); // Initialize IDT and GDT
     
-    x86_64::instructions::interrupts::int3(); // src/interrupts.rs | Line 169
+    let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let mut mapper = init(physical_memory_offset);
+    let mut frame_allocator = BootInfoFrameAllocator::init(&boot_info.memory_map);
+
+    let page = Page::containing_address(VirtAddr::new(0xdeadbeef000));
+    create_example_mapping(page, &mut mapper, &mut frame_allocator);
+
+    let page_ptr: *mut u64 = page.start_address().as_mut_ptr();
+    // 0x_f021_f077_f065_f04e -> New! (string)
+    unsafe { page_ptr.offset(400).write_volatile(0x_f021_f077_f065_f04e) };
 
     #[cfg(test)]
     test_main();
@@ -35,4 +48,3 @@ fn panic(info: &PanicInfo) -> ! {
 fn panic(info: &PanicInfo) -> ! {
     cometos::test_panic_handler(info)
 }
-

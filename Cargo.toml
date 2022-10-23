@@ -12,7 +12,7 @@ name = "stack_overflow"
 harness = false
 
 [dependencies]
-bootloader = "0.9.8" # loads the flat binary
+bootloader = { verison ="0.9.8", features = ["map_physical_memory"]} # loads the flat binary | map_physical_memory is used for paging
 volatile = "0.2.6" # prevents rust from optimizing away writes on the vga buffer
 spin = "0.5.2" # mutex provides  mutual exclusion by blocking threads when the reasource is already locked | bascially to get synchoronized interior mutability
 x86_64 = "0.14.10" # allows us to invoke "in" and "out" assembly instructions in a more rusty way
