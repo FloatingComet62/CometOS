@@ -2,14 +2,13 @@
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
 #![feature(abi_x86_interrupt)]
+#![feature(alloc_error_handler)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-pub mod serial;
-pub mod vga_buffer;
-pub mod interrupts;
-pub mod gdt;
+pub mod io;
 pub mod memory;
+extern crate alloc;
 
 #[cfg(test)]
 use bootloader::{entry_point, BootInfo};
@@ -29,12 +28,17 @@ pub fn hlt_loop() -> ! {
     }
 }
 
+#[alloc_error_handler]
+fn allow_error_handler(layout: alloc::alloc::Layout) -> ! {
+    panic!("allocation error: {:?}", layout)
+}
+
 // GDT & IDT setup
 pub fn init() {
-    gdt::init();
-    interrupts::init_idt();
+    memory::gdt::init();
+    memory::interrupts::init_idt();
     unsafe {
-        interrupts::PICS.lock().initialize()
+        memory::interrupts::PICS.lock().initialize()
     };
     x86_64::instructions::interrupts::enable();
 }

@@ -24,7 +24,7 @@ pub enum Color {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
-struct ColorCode(u8);
+pub struct ColorCode(u8);
 impl ColorCode {
     fn new(foreground: Color, background: Color) -> ColorCode {
         ColorCode((background as u8) << 4 | (foreground as u8))
@@ -39,19 +39,19 @@ impl ColorCode {
 // 15         Blink
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
-struct ScreenChar {
-    ascii_character: u8,
-    color_code: ColorCode,
+pub struct ScreenChar {
+    pub ascii_character: u8,
+    pub color_code: ColorCode,
 }
 
-const BUFFER_HEIGHT: usize = 25;
-const BUFFER_WIDTH: usize = 80;
+pub const BUFFER_HEIGHT: usize = 25;
+pub const BUFFER_WIDTH: usize = 80;
 
 use volatile::Volatile;
 
 #[repr(transparent)]
-struct Buffer {
-    chars: [
+pub struct Buffer {
+    pub chars: [
         [
             Volatile<ScreenChar>; // Cargo.toml | Line 16 
             BUFFER_WIDTH
@@ -65,7 +65,7 @@ use core::fmt;
 pub struct Writer {
     column_position: usize,
     color_code: ColorCode,
-    buffer: &'static mut Buffer,
+    pub buffer: &'static mut Buffer,
 }
 impl Writer {
     pub fn write_byte(&mut self, byte: u8) {
@@ -141,16 +141,6 @@ lazy_static! {
     });
 }
 
-// Macros
-#[macro_export]
-macro_rules! print {
-    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
-}
-#[macro_export]
-macro_rules! println {
-    () => ($crate::print!("\n"));
-    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
-}
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
@@ -161,33 +151,3 @@ pub fn _print(args: fmt::Arguments) {
     })
 }
 
-// Tests
-#[test_case]
-fn test_println_simple() {
-    println!("test_println_simple output");
-}
-
-#[test_case]
-fn test_println_many() {
-    for _ in 0..200 {
-        println!("test_println_many output");
-    }
-}
-
-#[test_case]
-fn test_println_output() {
-    use core::fmt::Write;
-    use x86_64::instructions::interrupts;
-
-    let s = "Some test string that fits in 1 line";
-    interrupts::without_interrupts(|| {
-        let mut writer = WRITER.lock();
-        writeln!(writer, "\n{}", s).expect("writeln failed");
-        for (i, c) in s.chars().enumerate() {
-            // Since the println prints to the last screen line and then immediately appends a newline,
-            // the string should appear on line BUFFER_HEIGHT - 2
-            let screen_char = writer.buffer.chars[BUFFER_HEIGHT - 2][i].read();
-            assert_eq!(char::from(screen_char.ascii_character), c);
-        }
-    });
-}

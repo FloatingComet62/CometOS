@@ -19,6 +19,7 @@ x86_64 = "0.14.10" # allows us to invoke "in" and "out" assembly instructions in
 uart_16550 = "0.2.18" # Allows us to print stuff in the console
 pic8259 = "0.10.2" # allows us to access hardware interrupts
 pc-keyboard = "0.5.0" # keyboard mappings
+linked_list_allocator = "0.9.0" # heap memory allocator
 
 [dependencies.lazy_static]
 version = "1.0"
