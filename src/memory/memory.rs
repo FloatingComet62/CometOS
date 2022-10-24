@@ -34,10 +34,12 @@
 //
 //! KEEP THINGS TO THE SAME SIZE
 
-use x86_64:: {
-    structures::paging::{PageTable, OffsetPageTable},
-    VirtAddr
+use x86_64::{
+    PhysAddr,
+    VirtAddr,
+    structures::paging::{Page, PhysFrame, Mapper, Size4KiB, FrameAllocator, PageTable, OffsetPageTable},
 };
+use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
 
 // Returns a mutable reference to the active level 4 table.
 //
@@ -61,11 +63,6 @@ fn active_level4_table(physical_memory_offset: VirtAddr) -> &'static mut PageTab
     unsafe { &mut *page_table_ptr }
 }
 
-use x86_64::{
-    PhysAddr,
-    structures::paging::{Page, PhysFrame, Mapper, Size4KiB, FrameAllocator}
-};
-
 pub fn create_example_mapping(page: Page, mapper: &mut OffsetPageTable, frame_allocator: &mut impl FrameAllocator<Size4KiB>) {
     use x86_64::structures::paging::PageTableFlags as Flags;
 
@@ -86,8 +83,6 @@ unsafe impl FrameAllocator<Size4KiB> for EmptyFrameAllocator {
         None
     }
 }
-
-use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
 
 // A FrameAllocator that returns usable frames from the bootloader's memory map
 pub struct BootInfoFrameAllocator {

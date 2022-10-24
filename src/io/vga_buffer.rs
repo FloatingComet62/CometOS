@@ -1,4 +1,8 @@
-#[allow(dead_code)]
+use volatile::Volatile;
+use lazy_static::lazy_static;
+use spin::Mutex;
+use core::fmt;
+
 
 // Color
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,8 +51,6 @@ pub struct ScreenChar {
 pub const BUFFER_HEIGHT: usize = 25;
 pub const BUFFER_WIDTH: usize = 80;
 
-use volatile::Volatile;
-
 #[repr(transparent)]
 pub struct Buffer {
     pub chars: [
@@ -59,8 +61,6 @@ pub struct Buffer {
         BUFFER_HEIGHT
     ],
 }
-
-use core::fmt;
 
 pub struct Writer {
     column_position: usize,
@@ -128,9 +128,6 @@ impl fmt::Write for Writer {
         Ok(())
     }
 }
-
-use lazy_static::lazy_static;
-use spin::Mutex;
 
 // constants are initialized at compile time, this allows us to initialize constants at runtime
 lazy_static! {

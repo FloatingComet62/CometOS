@@ -73,10 +73,11 @@
 // line. When the user wants to continue the program, the debugger replaces the in3 instruction
 // with the original instruction again and continues the program.
 
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 use lazy_static::lazy_static;
-
-use crate::memory::gdt;
+use pic8259::ChainedPics;
+use spin;
+use crate::{println, print, hlt_loop, memory::gdt};
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
@@ -99,10 +100,7 @@ pub fn init_idt() {
     IDT.load();
 }
 
-
 // Hardware Interrupt setup
-use pic8259::ChainedPics;
-use spin;
 
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
@@ -123,9 +121,6 @@ impl InterruptIndex {
         usize::from(self.as_u8())
     }
 }
-
-use crate::{println, print, hlt_loop};
-use x86_64::structures::idt::PageFaultErrorCode;
 
 // Exception Handler
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
