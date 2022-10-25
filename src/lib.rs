@@ -13,7 +13,10 @@ pub mod task;
 extern crate alloc;
 
 #[cfg(test)]
-use bootloader::{entry_point, BootInfo};
+use bootloader::{
+    entry_point,
+    BootInfo
+};
 
 #[cfg(test)]
 entry_point!(test_kernel_main);
@@ -73,16 +76,6 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     loop {}
 }
 
-// Panic
-use core::panic::PanicInfo;
-
-#[cfg(test)]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    test_panic_handler(info)
-}
-
-
 // QEMU maps to different exit codes with this expression => (value << 1) | 1
 // Therefore,
 // 0 => 1
@@ -100,4 +93,13 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
         let mut port = Port::new(0xf4); // Port 0xf4 is the iobase of the isa-debug-exit device
         port.write(exit_code as u32);
     }
+}
+
+// Panic
+use core::panic::PanicInfo;
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    test_panic_handler(info)
 }

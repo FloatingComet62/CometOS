@@ -50,7 +50,7 @@ fn test_println_output() {
         for (i, c) in s.chars().enumerate() {
             // Since the println prints to the last screen line and then immediately appends a newline,
             // the string should appear on line BUFFER_HEIGHT - 2
-            let screen_char = writer.buffer.chars[vga_buffer::BUFFER_HEIGHT - 2][i].read();
+            let screen_char = writer.buffer.chars[vga_buffer::writer::BUFFER_HEIGHT - 2][i].read();
             assert_eq!(char::from(screen_char.ascii_character), c);
         }
     });

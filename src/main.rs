@@ -6,7 +6,10 @@
 
 extern crate alloc;
 
-use bootloader::{BootInfo, entry_point};
+use bootloader::{
+    BootInfo,
+    entry_point
+};
 use cometos::{
     println,
     task::{
