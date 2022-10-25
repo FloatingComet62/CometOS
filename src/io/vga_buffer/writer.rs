@@ -6,6 +6,11 @@ use core::fmt;
 // 8-11       Foreground color
 // 12-14      Background color
 // 15         Blink
+//
+// Since the field ordering in default structs is undefined in Rust, we need the repr(C) attribute.
+// It guarantees that the struct's fields are laid out exactly like in a C struct and thus
+// guarantees the coreect field ordering. For the Buffer struct, we use repr(transparent) agaain to
+// ensure that it has the same memory layout as its single field.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub struct ScreenChar {
@@ -27,6 +32,12 @@ pub struct Buffer {
     ],
 }
 
+// The writer will always write to the last line and shift lines up when a line is full(or on \n).
+// The column_position field keeps tract of the current position in the last row. The current
+// foreground and background colors are specified by color_code and a reference to the VGA buffer
+// is stored in buffer. Note that we need an explicit lifetime here to tell the compiler hwo long
+// the reference is valid. The 'static lifetime specifies that the reference is valid for the whole
+// program run time(which is true for the VGA text buffer).
 pub struct Writer {
     pub column_position: usize,
     pub color_code: super::color::ColorCode,

@@ -10,14 +10,7 @@ use bootloader::{
     BootInfo,
     entry_point
 };
-use cometos::{
-    println,
-    task::{
-        Task,
-        executor::Executor,
-        keyboard,
-    },
-};
+use cometos::println;
 
 // Main
 entry_point!(kernel_main);
@@ -40,19 +33,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     test_main();
 
     // CODE GOES HERE
-
-    let mut executor = Executor::new();
-    executor.spawn(Task::new(example_task()));
-    executor.spawn(Task::new(keyboard::print_keypresses()));
-    executor.run();
-}
-
-async fn num() -> u32 {
-    42
-}
-async fn example_task() {
-    let number = num().await;
-    println!("async numer: {}", number);
+    // CODE ENDS HERE
+    cometos::hlt_loop();
 }
 
 // Panic handler

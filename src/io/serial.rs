@@ -2,6 +2,13 @@ use uart_16550::SerialPort;
 use spin::Mutex;
 use lazy_static::lazy_static;
 
+// A simple way to send data is to use the serial port, an old interface standard which is no
+// longer found in modern computers. It is easy to program and QEMU can redirect the bytes to send
+// over serial to the host's standard output or a file.
+//
+// The chip implementing a serial interface are called UARTs. The common UARTs today are all
+// compatible with the 16550 UART.
+
 lazy_static! {
     pub static ref SERIAL1: Mutex<SerialPort> = {
         // port 0x3F8 is the standard port for  the first serial inferface

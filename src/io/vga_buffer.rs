@@ -9,7 +9,10 @@ pub mod writer;
 lazy_static! {
     pub static ref WRITER: Mutex<writer::Writer> = Mutex::new(writer::Writer {
         column_position: 0,
-        color_code: color::ColorCode::new(color::Color::Yellow, color::Color::Black),
+        color_code: color::ColorCode::new(
+            color::Color::Green, // Text color
+            color::Color::Black // Background color
+        ),
         buffer: unsafe { &mut *(0xb8000 as *mut writer::Buffer) }, // 0xb8000 is a mutable raw pointer
     });
 }
