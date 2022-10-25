@@ -9,6 +9,7 @@
 
 pub mod io;
 pub mod memory;
+pub mod task;
 extern crate alloc;
 
 #[cfg(test)]

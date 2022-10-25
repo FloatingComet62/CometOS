@@ -21,9 +21,23 @@ pic8259 = "0.10.2" # allows us to access hardware interrupts
 pc-keyboard = "0.5.0" # keyboard mappings
 linked_list_allocator = "0.9.0" # heap memory allocator
 
-[dependencies.lazy_static]
+[dependencies.lazy_static] # loads static variables on runtime
 version = "1.0"
 features = ["spin_no_std"] # we don't link to std,a so we need a version which doesn't require std
+
+[dependencies.crossbeam-queue] # implements Scancode Queue system for async/await
+version = "0.2.1"
+default-features = false # to make it no_std compatible
+features = ["alloc"]
+
+[dependencies.conquer-once] # allows us to perform a safe one-time initialization of static values.
+version = "0.2.0"
+default-features = false
+
+[dependencies.futures-util] # implements futures(async/await)
+version = "0.3.4"
+default-features = false # to make it no_std compatible
+features = ["alloc"]
 
 [package.metadata.bootimage]
 test-args = [
