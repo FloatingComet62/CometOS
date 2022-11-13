@@ -1,3 +1,8 @@
+// Index:
+// Imports       6
+// WRITER static 14
+// _print()      26
+
 use lazy_static::lazy_static;
 use spin::Mutex;
 use core::fmt;
@@ -23,7 +28,6 @@ pub fn _print(args: fmt::Arguments) {
     use x86_64::instructions::interrupts;
 
     interrupts::without_interrupts(|| {
-        WRITER.lock().write_fmt(args).unwrap();
-    })
+        WRITER.lock().write_fmt(args).unwrap(); // don't worry, vga buffer never fails
+    });
 }
-

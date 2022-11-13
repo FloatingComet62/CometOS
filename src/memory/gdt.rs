@@ -1,3 +1,10 @@
+// Index:
+// Imports    12
+// TSS static 21
+// Selectors  37
+// init()     50
+//
+//
 // GDT is a relic that was used for memory segmentation before paging became the de facto standard.
 // However, it is still needed in 64 bit mode for various things, such as kernal/user mode
 // configuration or TSS loading.

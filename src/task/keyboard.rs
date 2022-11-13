@@ -34,7 +34,8 @@ static WAKER: AtomicWaker = AtomicWaker::new();
 pub(crate) fn add_scancode(scancode: u8) {
     if let Ok(queue) = SCANCODE_QUEUE.try_get() {
         if let Err(_) = queue.push(scancode) {
-            println!("WARNING: scancode queue full; dropping keyboard input");
+            // This happens when you type too fast
+            // println!("WARNING: scancode queue full; dropping keyboard input");
         } else {
             WAKER.wake();
         }

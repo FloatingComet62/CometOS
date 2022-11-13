@@ -1,3 +1,8 @@
+// Index:
+// Color     8
+// ColorCode 29
+
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum Color {

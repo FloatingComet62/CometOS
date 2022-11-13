@@ -10,6 +10,8 @@
 pub mod io;
 pub mod memory;
 pub mod task;
+pub mod graphics;
+pub mod shell;
 extern crate alloc;
 
 #[cfg(test)]
@@ -38,7 +40,7 @@ fn allow_error_handler(layout: alloc::alloc::Layout) -> ! {
     panic!("allocation error: {:?}", layout)
 }
 
-// GDT & IDT setup
+// GDT, IDT & Shell setup
 pub fn init() {
     memory::gdt::init();
     memory::interrupts::init_idt();

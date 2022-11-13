@@ -1,3 +1,11 @@
+// Index:
+// Imports          9
+// ALLOCATOR static 28
+// init_heap()      35
+// Dummy            57
+// Locked           69
+// align_up()       86
+
 use core::{alloc::{GlobalAlloc, Layout}, ptr::null_mut};
 use linked_list::LinkedListAllocator;
 use x86_64::{

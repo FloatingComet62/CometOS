@@ -1,3 +1,12 @@
+// Index:
+// Imports                  46
+// init()                   59
+// active_level4_table()    63
+// create_example_mapping() 75
+// EmptyFrameAllocator      88
+// BootInfoFrameAllocator   97
+//
+//
 // Page Table format
 //
 // Page tables need to be page-aligned, aligned on a 4 KiB boundary.

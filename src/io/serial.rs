@@ -1,3 +1,8 @@
+// Index:
+// Imports        6
+// SERIAL1 static 17
+// _print()       27
+
 use uart_16550::SerialPort;
 use spin::Mutex;
 use lazy_static::lazy_static;

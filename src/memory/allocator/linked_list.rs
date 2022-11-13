@@ -1,3 +1,9 @@
+// Index:
+// Imports             7
+// ListNode            20
+// LinkedListAllocator 38
+// GlobalAlloc         115
+
 use core::{
     mem,
     ptr

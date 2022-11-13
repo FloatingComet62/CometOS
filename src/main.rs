@@ -10,9 +10,10 @@ use bootloader::{
     BootInfo,
     entry_point
 };
-use cometos::println;
+#[allow(unused_imports)]
+use cometos::{task::keyboard::ScancodeStream, print, println};
 
-// Main
+// Init and setup
 entry_point!(kernel_main);
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
     // INIT
@@ -20,7 +21,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     use x86_64::VirtAddr;
     use cometos::memory::allocator;
 
-    println!("Hello world{}", "!");
     cometos::init(); // Initialize IDT and GDT
     
     let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
@@ -29,12 +29,18 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     allocator::init_heap(&mut mapper, &mut frame_allocator).expect("heap init failed");
 
+    let _scancodestream = ScancodeStream::new();
+
     #[cfg(test)]
     test_main();
 
-    // CODE GOES HERE
-    // CODE ENDS HERE
+    main();
+
     cometos::hlt_loop();
+}
+
+fn main() {
+    print!("\n> ");
 }
 
 // Panic handler

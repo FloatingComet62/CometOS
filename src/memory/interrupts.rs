@@ -1,3 +1,11 @@
+// Index:
+// Imports                  84
+// IDT static               91
+// init_idt()               108
+// Hardware Interrupt Setup 112
+// Exception Handlers       134
+// Tests                    184
+//
 // InterruptDescriptorTable (IDT)
 // IDT is used to catch and handle exception
 // We specify a handler function for each CPU exception
@@ -77,7 +85,8 @@ use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, Pag
 use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use spin;
-use crate::{println, print, hlt_loop, memory::gdt};
+use crate::{println, hlt_loop, memory::gdt};
+use super::super::shell::get_char;
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
@@ -130,7 +139,6 @@ extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame,
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
 }
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
-    print!(".");
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
@@ -148,9 +156,15 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
             );
     }
 
+    let mut keyboard = KEYBOARD.lock();
     let mut port = Port::new(0x60);
 
     let scancode: u8 = unsafe { port.read() };
+    if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {
+        if let Some(key) = keyboard.process_keyevent(key_event) {
+            get_char(key);
+        }
+    }
     crate::task::keyboard::add_scancode(scancode);
     unsafe {
         PICS.lock()
