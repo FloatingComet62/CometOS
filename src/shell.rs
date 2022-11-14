@@ -1,4 +1,4 @@
-use alloc::{string::{ToString, String}, vec::Vec};
+use alloc::{string::{ToString, String}, vec::Vec, format};
 use pc_keyboard::DecodedKey;
 use crate::{print, println, io::vga_buffer::{WRITER, writer::BUFFER_HEIGHT}};
 
@@ -6,15 +6,51 @@ use super::exit_qemu;
 
 static mut COMMAND_DRAFT: String = String::new();
 static mut COMMAND: String = String::new();
+static mut HISTORY: Vec<String> = Vec::new();
+static mut POINT: usize = 0;
+
+fn check_or_add() {
+    unsafe {
+        match HISTORY.get(POINT) {
+            Some(_) => (),
+            None => {
+                HISTORY.push(String::new());
+                ()
+            }
+        }
+    }
+}
+
+fn update_history() {
+    unsafe {
+        match HISTORY.get(POINT) {
+            Some(_) => HISTORY[POINT] = COMMAND_DRAFT.clone(),
+            None => ()
+        }
+    }
+}
+
+fn update_display() {
+    WRITER.lock().clear_row(BUFFER_HEIGHT-1);
+    unsafe { print!("\n> {}", COMMAND_DRAFT); }
+}
 
 pub fn get_char(key: DecodedKey) {
+    check_or_add();
     match key {
         DecodedKey::Unicode(character) => {
             if character == '\n' {
                 unsafe {
+                    HISTORY.push(COMMAND_DRAFT.clone());
+
                     COMMAND = COMMAND_DRAFT.to_string();
                     COMMAND_DRAFT = String::new();
+                    
+                    // update history
+                    HISTORY.remove(POINT);
+                    POINT = 0;
                 };
+
                 println!();
                 run();
                 print!("\n> ");
@@ -31,8 +67,32 @@ pub fn get_char(key: DecodedKey) {
                 print!("{}", character);
             }
         }
-        DecodedKey::RawKey(_rawkey) => todo!(),
+        DecodedKey::RawKey(rawkey) => {
+            let name = format!("{:?}", rawkey);
+            unsafe {
+            if name == "ArrowUp" {
+                    if POINT == 0 {
+                        return;
+                    }
+
+                    POINT -= 1;
+                    COMMAND_DRAFT = HISTORY[POINT].clone();
+            } else if name == "ArrowDown" {
+                if COMMAND_DRAFT == "" {
+                    return;
+                }
+                COMMAND_DRAFT = HISTORY[POINT].clone(); // save the old draft
+                POINT += 1;
+                check_or_add();
+                COMMAND_DRAFT = HISTORY[POINT].clone(); // load the new draft
+            }
+            }
+
+            update_display();
+        },
     }
+
+    update_history();
 }
 
 fn run() {
