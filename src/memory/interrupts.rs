@@ -86,7 +86,7 @@ use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use spin;
 use crate::{println, hlt_loop, memory::gdt};
-use super::super::shell::get_char;
+// use super::super::shell::get_char;
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
@@ -162,7 +162,9 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
     let scancode: u8 = unsafe { port.read() };
     if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {
         if let Some(key) = keyboard.process_keyevent(key_event) {
-            get_char(key);
+            
+            // Uncomment to toggle shell
+            // get_char(key);
         }
     }
     crate::task::keyboard::add_scancode(scancode);

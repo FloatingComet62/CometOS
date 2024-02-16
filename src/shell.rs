@@ -2,7 +2,7 @@ use alloc::{string::{ToString, String}, vec::Vec, format};
 use pc_keyboard::DecodedKey;
 use crate::{print, println, io::vga_buffer::{WRITER, writer::BUFFER_HEIGHT}};
 
-use super::exit_qemu;
+use super::{exit_qemu, QemuExitCode};
 
 static mut COMMAND_DRAFT: String = String::new();
 static mut COMMAND: String = String::new();
@@ -41,13 +41,14 @@ pub fn get_char(key: DecodedKey) {
         DecodedKey::Unicode(character) => {
             if character == '\n' {
                 unsafe {
-                    HISTORY.push(COMMAND_DRAFT.clone());
+                    let topush = COMMAND_DRAFT.clone();
 
                     COMMAND = COMMAND_DRAFT.to_string();
                     COMMAND_DRAFT = String::new();
                     
                     // update history
                     HISTORY.remove(POINT);
+                    HISTORY.insert(0, topush);
                     POINT = 0;
                 };
 
@@ -59,9 +60,7 @@ pub fn get_char(key: DecodedKey) {
                 // rust doesn't support \b directly
                 unsafe { COMMAND_DRAFT.pop(); }
 
-                // update the vga buffer
-                WRITER.lock().clear_row(BUFFER_HEIGHT-1);
-                unsafe { print!("\n> {}", COMMAND_DRAFT); }
+                update_display();
             } else {
                 unsafe { COMMAND_DRAFT += character.to_string().as_str(); };
                 print!("{}", character);
@@ -119,14 +118,19 @@ fn run() {
         (cmd.to_lowercase(), arg)
     };
 
-    if command == "exit" {
-        exit_qemu(super::QemuExitCode::Success);
+    if command == "" { // do nothing
+    } else if command == "exit" {
+        exit_qemu(QemuExitCode::Success); // ! not working
+        super::hlt_loop();
     } else if command == "clear" {
         for i in 1..BUFFER_HEIGHT {
             WRITER.lock().clear_row(i);
         }
     }else if command == "echo" {
         println!("{}", args.join(" "));
+    } else if command == "rand" {
+        // let rand = x86_64::instructions::random::RdRand(());
+        // println!("{:?}", rand);
     } else {
         println!("{} is not a command", command);
     }

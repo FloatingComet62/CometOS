@@ -1,13 +1,14 @@
 // Index:
 // Imports       13
 // ScreenChar    28
-// Writer        53
-//  write_byte   |  59
-//  write_string |  80
-//  new_line     |  91
-//  clear_row    |  103
+// Buffer        38
+// Writer        54
+//  write_byte   |  60
+//  write_string |  81
+//  new_line     |  92
+//  clear_row    |  104
 //               |
-//  write_str    |  114
+//  write_str    |  115
 
 
 use volatile::Volatile;
@@ -21,7 +22,7 @@ use core::fmt;
 //
 // Since the field ordering in default structs is undefined in Rust, we need the repr(C) attribute.
 // It guarantees that the struct's fields are laid out exactly like in a C struct and thus
-// guarantees the coreect field ordering. For the Buffer struct, we use repr(transparent) agaain to
+// guarantees the coreect field ordering. For the Buffer struct, we use repr(transparent) again to
 // ensure that it has the same memory layout as its single field.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]

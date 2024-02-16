@@ -11,7 +11,7 @@ use bootloader::{
     entry_point
 };
 #[allow(unused_imports)]
-use cometos::{task::keyboard::ScancodeStream, print, println};
+use cometos::{task::keyboard::ScancodeStream, print, println, graphics};
 
 // Init and setup
 entry_point!(kernel_main);
@@ -40,7 +40,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 }
 
 fn main() {
-    print!("\n> ");
+    graphics::init();
 }
 
 // Panic handler

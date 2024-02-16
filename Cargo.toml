@@ -12,15 +12,15 @@ name = "stack_overflow"
 harness = false
 
 [dependencies]
-bootloader = { verison ="0.9.8", features = ["map_physical_memory"]} # loads the flat binary | map_physical_memory is used for paging
-volatile = "0.2.6" # prevents rust from optimizing away writes on the vga buffer
-spin = "0.5.2" # mutex provides  mutual exclusion by blocking threads when the reasource is already locked | bascially to get synchoronized interior mutability
-x86_64 = "0.14.10" # allows us to invoke "in" and "out" assembly instructions in a more rusty way
-uart_16550 = "0.2.18" # Allows us to print stuff in the console
-pic8259 = "0.10.2" # allows us to access hardware interrupts
-pc-keyboard = "0.5.0" # keyboard mappings
-linked_list_allocator = "0.9.0" # heap memory allocator
-embedded-graphics = "0.7.1" # graphics driver used to draw stuff to screen
+bootloader = { verison = "=0.9.23", features = ["map_physical_memory"]} # loads the flat binary | map_physical_memory is used for paging
+volatile = "=0.2.6" # prevents rust from optimizing away writes on the vga buffer
+spin = "=0.5.2" # mutex provides  mutual exclusion by blocking threads when the reasource is already locked | bascially to get synchoronized interior mutability
+x86_64 = "=0.14.10" # executes x86 stuff for us
+uart_16550 = "=0.2.18" # Allows us to print stuff in the console
+pic8259 = "=0.10.2" # allows us to access hardware interrupts
+pc-keyboard = "=0.5.0" # keyboard mappings
+linked_list_allocator = "=0.9.0" # heap memory allocator
+embedded-graphics = "=0.7.1" # graphics driver used to draw stuff to screen
 
 [dependencies.lazy_static] # loads static variables on runtime
 version = "1.0"
